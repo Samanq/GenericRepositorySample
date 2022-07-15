@@ -6,45 +6,45 @@ namespace GenericRepositorySample.Api.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        public DataContext DataContext { get; }
-        public DbSet<T> Table { get; }
+        private DataContext _dataContext;
+        private DbSet<T> _table;
 
         public GenericRepository(DataContext dataContext)
         {
-            DataContext = dataContext;
-            Table = DataContext.Set<T>();
+            _dataContext = dataContext;
+            _table = _dataContext.Set<T>();
         }
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return await Table.ToListAsync();
+            return await _table.ToListAsync();
         }
 
         public async Task<T> GetById(long id)
         {
-            return await Table.FindAsync(id);
+            return await _table.FindAsync(id);
         }
 
         public async Task Add(T t)
         {
-            await Table.AddAsync(t);
-            await DataContext.SaveChangesAsync();
+            await _table.AddAsync(t);
+            await _dataContext.SaveChangesAsync();
         }
 
         public async Task Edit(T t)
         {
-            DataContext.Entry(t).State = EntityState.Modified;
-            await DataContext.SaveChangesAsync();
+            _dataContext.Entry(t).State = EntityState.Modified;
+            await _dataContext.SaveChangesAsync();
         }
 
         public async Task Delete(long id)
         {
-            T obj = await Table.FindAsync(id);
+            T obj = await _table.FindAsync(id);
 
             if (obj != null)
             {
-                Table.Remove(obj);
-                DataContext.SaveChanges();
+                _table.Remove(obj);
+                _dataContext.SaveChanges();
             }
         }
     }
